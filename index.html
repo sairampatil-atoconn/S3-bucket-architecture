@@ -1,0 +1,1227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daycare SaaS File Architecture – Technical Specification</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#111936;
+      --panel-2:#162247;
+      --card:#0f1731;
+      --text:#edf2ff;
+      --muted:#b8c4ea;
+      --soft:#8da0d6;
+      --line:#2a396f;
+      --accent:#7cc4ff;
+      --accent-2:#9ff5d2;
+      --warn:#ffd27a;
+      --good:#8ef0a7;
+      --code:#091226;
+      --shadow: 0 12px 32px rgba(0,0,0,.28);
+      --max: 1280px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(124,196,255,.08), transparent 20%),
+        radial-gradient(circle at top left, rgba(159,245,210,.08), transparent 20%),
+        linear-gradient(180deg, #08101f 0%, #0b1020 100%);
+      color:var(--text);
+      line-height:1.65;
+    }
+    a{color:var(--accent)}
+    .layout{
+      display:grid;
+      grid-template-columns: 310px 1fr;
+      min-height:100vh;
+    }
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      background:rgba(8,12,26,.92);
+      border-right:1px solid var(--line);
+      padding:22px 18px 40px;
+      backdrop-filter: blur(12px);
+    }
+    .brand{
+      padding:16px;
+      background:linear-gradient(180deg, rgba(124,196,255,.14), rgba(159,245,210,.06));
+      border:1px solid var(--line);
+      border-radius:18px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
+    .brand h1{
+      margin:0 0 8px;
+      font-size:1.1rem;
+      line-height:1.35;
+    }
+    .brand p{
+      margin:0;
+      color:var(--muted);
+      font-size:.93rem;
+    }
+    .nav-group{
+      margin-top:18px;
+    }
+    .nav-group h3{
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--soft);
+      margin:0 0 10px;
+    }
+    .nav{
+      display:grid;
+      gap:8px;
+    }
+    .nav a{
+      display:block;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.04);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:.93rem;
+    }
+    .nav a:hover{
+      border-color:var(--line);
+      background:rgba(124,196,255,.06);
+    }
+    main{
+      width:min(var(--max), calc(100vw - 310px));
+      padding:32px;
+      margin:0 auto;
+    }
+    .hero{
+      background:linear-gradient(135deg, rgba(124,196,255,.12), rgba(159,245,210,.06));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:34px;
+      box-shadow:var(--shadow);
+    }
+    .eyebrow{
+      display:inline-block;
+      font-size:.8rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--accent-2);
+      margin-bottom:14px;
+    }
+    .hero h2{
+      margin:0 0 12px;
+      font-size:2.2rem;
+      line-height:1.15;
+    }
+    .hero p{
+      color:var(--muted);
+      font-size:1.02rem;
+      max-width:900px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-top:24px;
+    }
+    .metric{
+      background:rgba(7,12,30,.55);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+    }
+    .metric b{
+      display:block;
+      font-size:1.5rem;
+      margin-bottom:6px;
+    }
+    section{
+      margin-top:28px;
+      background:rgba(17,25,54,.72);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:28px;
+      box-shadow:var(--shadow);
+    }
+    section h2{
+      margin:0 0 12px;
+      font-size:1.65rem;
+    }
+    section h3{
+      margin:28px 0 10px;
+      font-size:1.15rem;
+      color:var(--accent-2);
+    }
+    section h4{
+      margin:20px 0 8px;
+      font-size:1rem;
+      color:var(--warn);
+    }
+    section p, li{
+      color:var(--muted);
+    }
+    ul, ol{
+      padding-left:22px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:16px;
+      margin-top:18px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+    }
+    .card h4{
+      margin-top:0;
+      color:var(--text);
+    }
+    .callout{
+      border-left:4px solid var(--accent);
+      background:rgba(124,196,255,.08);
+      padding:16px 18px;
+      border-radius:12px;
+      margin:16px 0;
+      color:var(--text);
+    }
+    .good{
+      border-left-color:var(--good);
+      background:rgba(142,240,167,.08);
+    }
+    .warn{
+      border-left-color:var(--warn);
+      background:rgba(255,210,122,.08);
+    }
+    pre{
+      background:var(--code);
+      border:1px solid var(--line);
+      padding:16px;
+      border-radius:16px;
+      overflow:auto;
+      color:#dce8ff;
+      font-size:.92rem;
+      line-height:1.5;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .flow{
+      display:grid;
+      grid-template-columns:repeat(6, 1fr);
+      gap:12px;
+      margin-top:16px;
+    }
+    .flow .step{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      min-height:120px;
+      position:relative;
+    }
+    .flow .step span{
+      display:inline-flex;
+      width:28px;height:28px;
+      align-items:center;justify-content:center;
+      border-radius:50%;
+      background:rgba(124,196,255,.16);
+      border:1px solid var(--line);
+      margin-bottom:10px;
+      font-weight:700;
+    }
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:16px;
+      margin-top:14px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+      background:rgba(8,15,32,.65);
+    }
+    th, td{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+      text-align:left;
+    }
+    th{
+      background:rgba(124,196,255,.08);
+      color:var(--text);
+      font-size:.92rem;
+    }
+    td{
+      color:var(--muted);
+      font-size:.94rem;
+    }
+    .pill{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(124,196,255,.08);
+      color:var(--text);
+      font-size:.84rem;
+      margin:2px 6px 2px 0;
+    }
+    .checklist{
+      display:grid;
+      gap:10px;
+      margin-top:16px;
+    }
+    .check{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.02);
+    }
+    .check b{
+      color:var(--text);
+    }
+    .footer{
+      margin:30px 0 60px;
+      color:var(--soft);
+      font-size:.92rem;
+      text-align:center;
+    }
+    .top-link{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      background:rgba(8,12,26,.92);
+      border:1px solid var(--line);
+      color:var(--text);
+      text-decoration:none;
+      border-radius:999px;
+      padding:12px 16px;
+      box-shadow:var(--shadow);
+    }
+    @media (max-width: 1080px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      main{width:100%;padding:20px}
+      .hero-grid, .cards, .flow{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 720px){
+      .hero h2{font-size:1.7rem}
+      .hero-grid, .cards, .flow{grid-template-columns:1fr}
+      section{padding:20px}
+    }
+  </style>
+</head>
+<body>
+<div class="layout" id="top">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Daycare SaaS File Architecture</h1>
+      <p>Comprehensive technical specification for uploads, storage prefixes, processing pipelines, security, delivery, and production rollout.</p>
+    </div>
+
+    <div class="nav-group">
+      <h3>Overview</h3>
+      <nav class="nav">
+        <a href="#summary">Executive summary</a>
+        <a href="#principles">Core design principles</a>
+        <a href="#architecture">Target architecture</a>
+        <a href="#flow">End-to-end flow</a>
+      </nav>
+    </div>
+
+    <div class="nav-group">
+      <h3>Storage design</h3>
+      <nav class="nav">
+        <a href="#scope">Scope model</a>
+        <a href="#buckets">Buckets</a>
+        <a href="#prefixes">Canonical prefixes</a>
+        <a href="#examples">Prefix examples</a>
+        <a href="#categories">Category taxonomy</a>
+        <a href="#variants">Variant taxonomy</a>
+      </nav>
+    </div>
+
+    <div class="nav-group">
+      <h3>Application design</h3>
+      <nav class="nav">
+        <a href="#database">Database schema</a>
+        <a href="#api">API contracts</a>
+        <a href="#keybuilder">Key builder rules</a>
+        <a href="#validation">Validation policy</a>
+        <a href="#processing">Processing pipelines</a>
+      </nav>
+    </div>
+
+    <div class="nav-group">
+      <h3>Operations</h3>
+      <nav class="nav">
+        <a href="#security">Security model</a>
+        <a href="#observability">Observability</a>
+        <a href="#retention">Lifecycle and retention</a>
+        <a href="#implementation">Implementation plan</a>
+        <a href="#checklist">Go-live checklist</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <span class="eyebrow">Production-grade technical spec</span>
+      <h2>Enterprise file ingestion and media processing platform for a daycare management SaaS</h2>
+      <p>
+        This page documents a complete, production-ready architecture for student, staff, guardian, school, and org-level uploads.
+        It includes naming rules, S3 prefix structure, database design, API contracts, image/video/document handling, access control,
+        lifecycle management, and a phased implementation plan.
+      </p>
+      <div class="hero-grid">
+        <div class="metric"><b>2</b> Dedicated S3 buckets: raw + processed</div>
+        <div class="metric"><b>1</b> Unified file metadata table as source of truth</div>
+        <div class="metric"><b>5</b> Primary scopes: org, school, students, staff, guardians</div>
+        <div class="metric"><b>3</b> Processing tracks: image, video, document</div>
+      </div>
+    </header>
+
+    <section id="summary">
+      <h2>1. Executive summary</h2>
+      <p>
+        The recommended design is to separate original uploads from processed derivatives. Clients upload directly to a raw bucket
+        using presigned URLs. S3 events route work through SQS into Lambda-based processors. Images are transformed in Lambda, videos
+        are submitted to MediaConvert, and documents remain preserved as originals with optional previews and text extraction.
+      </p>
+      <div class="callout good">
+        <strong>Key rule:</strong> never overwrite originals. Keep the original file for audit, reprocessing, compliance, quality recovery,
+        and future derivative generation.
+      </div>
+      <div class="cards">
+        <div class="card">
+          <h4>Why this fits your SaaS</h4>
+          <p>
+            The system naturally supports per-student isolation, staff and guardian profile media, school-level shared assets,
+            and org-level uploads such as newsletters or admin documents. It also works when a user belongs to multiple schools
+            or exists at the org level without belonging to a school.
+          </p>
+        </div>
+        <div class="card">
+          <h4>What changes from a basic setup</h4>
+          <p>
+            Instead of using loose paths or school-only scoping, every object key begins with <code>org/{org_code}</code> and includes
+            school scope using a real school code or <code>_shared</code>. Every business object is tracked in the database using
+            immutable <code>code</code> values rather than ids.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2>2. Core design principles</h2>
+      <div class="checklist">
+        <div class="check"><div>1.</div><div><b>Always org-first.</b> Every object key includes <code>org/{org_code}</code> before anything else.</div></div>
+        <div class="check"><div>2.</div><div><b>Always code-based.</b> Use <code>school_code</code>, <code>student_code</code>, <code>file_code</code>, never ids.</div></div>
+        <div class="check"><div>3.</div><div><b>Separate originals and derivatives.</b> Raw uploads and processed assets live in different buckets.</div></div>
+        <div class="check"><div>4.</div><div><b>Database is source of truth.</b> The app never depends on S3 list operations for business logic.</div></div>
+        <div class="check"><div>5.</div><div><b>Paths are deterministic.</b> All keys are built by shared utility functions, never hand-written ad hoc.</div></div>
+        <div class="check"><div>6.</div><div><b>Access is policy-driven.</b> Authorize against org, school, subject, and related business entities, not just the path.</div></div>
+        <div class="check"><div>7.</div><div><b>Processing is retry-safe.</b> All workers must be idempotent and resilient to duplicate event delivery.</div></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <h2>3. Target architecture</h2>
+      <div class="cards">
+        <div class="card">
+          <h4>Control plane</h4>
+          <p>
+            API service for upload authorization, metadata creation, validation, file listings, secure reads, and business access checks.
+          </p>
+          <p>
+            Main records live in a unified <code>files</code> table and optional support tables for attachments, activity relationships,
+            newsletter relationships, and processing jobs.
+          </p>
+        </div>
+        <div class="card">
+          <h4>Data plane</h4>
+          <p>
+            Clients upload directly to S3 raw bucket. S3 emits create events. SQS buffers work. Lambda routes processing. MediaConvert
+            handles video transcoding. Processed assets are delivered through CloudFront.
+          </p>
+        </div>
+      </div>
+
+      <h3>Recommended AWS building blocks</h3>
+      <div>
+        <span class="pill">S3 Raw Bucket</span>
+        <span class="pill">S3 Processed Bucket</span>
+        <span class="pill">SQS Queue</span>
+        <span class="pill">Lambda Router</span>
+        <span class="pill">Image Processor Lambda</span>
+        <span class="pill">Document Processor Lambda</span>
+        <span class="pill">MediaConvert</span>
+        <span class="pill">CloudFront</span>
+        <span class="pill">CloudWatch</span>
+        <span class="pill">DLQ</span>
+      </div>
+    </section>
+
+    <section id="flow">
+      <h2>4. End-to-end flow</h2>
+      <div class="flow">
+        <div class="step"><span>1</span><strong>Presign request</strong><br>Client sends org, school, subject, category, filename, size, and content type to backend.</div>
+        <div class="step"><span>2</span><strong>Create file record</strong><br>Backend validates scope and writes a <code>files</code> row with status <code>uploading</code>.</div>
+        <div class="step"><span>3</span><strong>Direct upload</strong><br>Client uploads to raw bucket using presigned URL for one exact key.</div>
+        <div class="step"><span>4</span><strong>S3 event</strong><br>Object-created event lands in SQS to decouple upload spikes from processing.</div>
+        <div class="step"><span>5</span><strong>Async processing</strong><br>Lambda inspects file type and routes to image, video, or document flow.</div>
+        <div class="step"><span>6</span><strong>Ready for delivery</strong><br>Processed manifest is stored in DB and the app serves allowed variants via CloudFront.</div>
+      </div>
+
+      <div class="callout warn">
+        <strong>Important:</strong> the processed bucket must not trigger the same processing pipeline. Only the raw bucket should create processing events.
+      </div>
+    </section>
+
+    <section id="scope">
+      <h2>5. Scope model</h2>
+      <p>
+        Your system must support both school-linked and org-only users. That means storage and metadata cannot assume that every file belongs
+        to a school. The system therefore always starts at org scope, then optionally adds school scope and subject scope.
+      </p>
+
+      <h3>Supported scope combinations</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Use case</th>
+              <th>org_code</th>
+              <th>school_code</th>
+              <th>subject_type</th>
+              <th>subject_code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Student activity image</td>
+              <td>Required</td>
+              <td>Required</td>
+              <td>students</td>
+              <td>student_code</td>
+            </tr>
+            <tr>
+              <td>Staff profile photo within a school</td>
+              <td>Required</td>
+              <td>Required</td>
+              <td>staff</td>
+              <td>staff_code</td>
+            </tr>
+            <tr>
+              <td>Org admin profile photo</td>
+              <td>Required</td>
+              <td>Not applicable → <code>_shared</code></td>
+              <td>staff</td>
+              <td>staff_code</td>
+            </tr>
+            <tr>
+              <td>Guardian file</td>
+              <td>Required</td>
+              <td>Usually required, else <code>_shared</code></td>
+              <td>guardians</td>
+              <td>guardian_code</td>
+            </tr>
+            <tr>
+              <td>Org newsletter or general shared doc</td>
+              <td>Required</td>
+              <td><code>_shared</code></td>
+              <td>org</td>
+              <td>Not required</td>
+            </tr>
+            <tr>
+              <td>School-wide announcement/menu</td>
+              <td>Required</td>
+              <td>Required</td>
+              <td>school</td>
+              <td>Not required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="buckets">
+      <h2>6. Bucket design</h2>
+      <h3>Bucket naming</h3>
+      <pre><code>daycare-raw-prod
+daycare-processed-prod
+
+daycare-raw-staging
+daycare-processed-staging</code></pre>
+
+      <h3>Bucket configuration</h3>
+      <ul>
+        <li>Versioning enabled</li>
+        <li>Encryption enabled</li>
+        <li>Public access blocked</li>
+        <li>Lifecycle rules enabled</li>
+        <li>Server access logging or CloudTrail data events if required</li>
+      </ul>
+
+      <div class="callout">
+        Use one raw and one processed bucket per environment, not a bucket per org or per school. Isolation is enforced with prefixes,
+        DB ownership, IAM, application authorization, and delivery controls.
+      </div>
+    </section>
+
+    <section id="prefixes">
+      <h2>7. Canonical prefix structure</h2>
+
+      <h3>Raw bucket structure</h3>
+      <pre><code>raw/org/{org_code}/school/{school_code_or_shared}/{subject_type}/{subject_code_or_shared}/{category}/{yyyy}/{mm}/{dd}/{file_code}/original/{sanitized_filename}</code></pre>
+
+      <h3>Processed bucket structure</h3>
+      <pre><code>processed/org/{org_code}/school/{school_code_or_shared}/{subject_type}/{subject_code_or_shared}/{category}/{yyyy}/{mm}/{dd}/{file_code}/{variant}/{filename}</code></pre>
+
+      <h3>Subject types</h3>
+      <div>
+        <span class="pill">students</span>
+        <span class="pill">staff</span>
+        <span class="pill">guardians</span>
+        <span class="pill">org</span>
+        <span class="pill">school</span>
+      </div>
+
+      <h3>Key rules</h3>
+      <ul>
+        <li><code>org/{org_code}</code> is always present.</li>
+        <li><code>school/{school_code}</code> is always present; if not applicable, use <code>school/_shared</code>.</li>
+        <li><code>file_code</code> is always present and is the unique anchor for file tracking.</li>
+        <li>The final path segment stores a sanitized filename for readability, not uniqueness.</li>
+      </ul>
+    </section>
+
+    <section id="examples">
+      <h2>8. Prefix examples</h2>
+
+      <h3>Student activity image</h3>
+      <pre><code>raw/org/org_sunrise/school/sch_bluebird/students/stu_001/activity-media/2026/03/23/fil_a100/original/painting.jpg
+processed/org/org_sunrise/school/sch_bluebird/students/stu_001/activity-media/2026/03/23/fil_a100/thumb_256/painting.webp
+processed/org/org_sunrise/school/sch_bluebird/students/stu_001/activity-media/2026/03/23/fil_a100/medium/painting.webp
+processed/org/org_sunrise/school/sch_bluebird/students/stu_001/activity-media/2026/03/23/fil_a100/large/painting.webp</code></pre>
+
+      <h3>Student medical PDF</h3>
+      <pre><code>raw/org/org_sunrise/school/sch_bluebird/students/stu_001/medical-documents/2026/03/23/fil_d100/original/vaccination.pdf
+processed/org/org_sunrise/school/sch_bluebird/students/stu_001/medical-documents/2026/03/23/fil_d100/preview-image/page1.jpg
+processed/org/org_sunrise/school/sch_bluebird/students/stu_001/medical-documents/2026/03/23/fil_d100/text-extract/content.json</code></pre>
+
+      <h3>Org admin profile image</h3>
+      <pre><code>raw/org/org_sunrise/school/_shared/staff/stf_admin1/profile-photo/2026/03/23/fil_p100/original/avatar.png
+processed/org/org_sunrise/school/_shared/staff/stf_admin1/profile-photo/2026/03/23/fil_p100/thumb_128/avatar.webp
+processed/org/org_sunrise/school/_shared/staff/stf_admin1/profile-photo/2026/03/23/fil_p100/thumb_256/avatar.webp</code></pre>
+
+      <h3>School menu PDF</h3>
+      <pre><code>raw/org/org_sunrise/school/sch_bluebird/school/_shared/menus/2026/03/23/fil_m100/original/menu-april.pdf
+processed/org/org_sunrise/school/sch_bluebird/school/_shared/menus/2026/03/23/fil_m100/preview-image/page1.jpg</code></pre>
+
+      <h3>Org newsletter</h3>
+      <pre><code>raw/org/org_sunrise/school/_shared/org/_shared/newsletters/2026/03/23/fil_n100/original/april-newsletter.pdf
+processed/org/org_sunrise/school/_shared/org/_shared/newsletters/2026/03/23/fil_n100/preview-image/page1.jpg</code></pre>
+
+      <div class="callout good">
+        For consistency, even subject types that do not need a specific subject code can use <code>_shared</code> in the subject code slot.
+        That keeps all key builders deterministic.
+      </div>
+    </section>
+
+    <section id="categories">
+      <h2>9. Category taxonomy</h2>
+      <div class="cards">
+        <div class="card">
+          <h4>Student categories</h4>
+          <p>
+            <span class="pill">profile-photo</span>
+            <span class="pill">activity-media</span>
+            <span class="pill">activity-documents</span>
+            <span class="pill">medical-documents</span>
+            <span class="pill">attendance-attachments</span>
+            <span class="pill">incident-reports</span>
+            <span class="pill">billing-documents</span>
+            <span class="pill">admission-documents</span>
+            <span class="pill">misc</span>
+          </p>
+        </div>
+        <div class="card">
+          <h4>Staff and guardian categories</h4>
+          <p>
+            <span class="pill">profile-photo</span>
+            <span class="pill">documents</span>
+            <span class="pill">compliance-documents</span>
+            <span class="pill">training-documents</span>
+            <span class="pill">misc</span>
+          </p>
+        </div>
+        <div class="card">
+          <h4>Org categories</h4>
+          <p>
+            <span class="pill">newsletters</span>
+            <span class="pill">announcements</span>
+            <span class="pill">general-documents</span>
+            <span class="pill">marketing-assets</span>
+            <span class="pill">branding-assets</span>
+            <span class="pill">misc</span>
+          </p>
+        </div>
+        <div class="card">
+          <h4>School categories</h4>
+          <p>
+            <span class="pill">announcements</span>
+            <span class="pill">menus</span>
+            <span class="pill">policies</span>
+            <span class="pill">general-documents</span>
+            <span class="pill">misc</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="variants">
+      <h2>10. Variant taxonomy</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Media type</th>
+              <th>Variant examples</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Image</td>
+              <td><code>thumb_64</code>, <code>thumb_128</code>, <code>thumb_256</code>, <code>medium</code>, <code>large</code>, <code>webp</code>, <code>avif</code></td>
+              <td>Avatar rendering, timeline cards, gallery views, optimized delivery</td>
+            </tr>
+            <tr>
+              <td>Video</td>
+              <td><code>video_360p</code>, <code>video_720p</code>, <code>video_1080p</code>, <code>poster-frame</code>, <code>hls</code></td>
+              <td>Playback tiers, poster preview, optional adaptive streaming</td>
+            </tr>
+            <tr>
+              <td>Document</td>
+              <td><code>preview-image</code>, <code>preview-pdf</code>, <code>text-extract</code>, <code>ocr-json</code></td>
+              <td>Preview rendering, text search, OCR-based extraction</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="database">
+      <h2>11. Database schema</h2>
+      <p>
+        The database is the source of truth for ownership, authorization, processing status, and all derived assets. The application
+        should never determine file state by listing S3 keys.
+      </p>
+
+      <h3>Main files table</h3>
+      <pre><code>CREATE TABLE files (
+    file_code                VARCHAR(64) PRIMARY KEY,
+
+    org_code                 VARCHAR(64) NOT NULL,
+    school_code              VARCHAR(64) NULL,
+
+    subject_type             VARCHAR(32) NOT NULL,
+    subject_code             VARCHAR(64) NULL,
+
+    category                 VARCHAR(64) NOT NULL,
+
+    related_entity_type      VARCHAR(64) NULL,
+    related_entity_code      VARCHAR(64) NULL,
+    module_context           VARCHAR(64) NULL,
+
+    original_bucket          VARCHAR(255) NOT NULL,
+    original_key             TEXT NOT NULL,
+
+    processed_bucket         VARCHAR(255) NULL,
+    processed_manifest_json  JSONB NULL,
+
+    status                   VARCHAR(32) NOT NULL,
+    file_type                VARCHAR(32) NOT NULL,
+    mime_type                VARCHAR(255) NOT NULL,
+    extension                VARCHAR(32) NULL,
+
+    original_filename        TEXT NOT NULL,
+    sanitized_filename       TEXT NOT NULL,
+
+    size_bytes               BIGINT NULL,
+    checksum_sha256          VARCHAR(128) NULL,
+
+    width                    INTEGER NULL,
+    height                   INTEGER NULL,
+    duration_seconds         NUMERIC(12,3) NULL,
+    page_count               INTEGER NULL,
+
+    uploaded_by_user_code    VARCHAR(64) NOT NULL,
+    uploaded_by_role         VARCHAR(64) NOT NULL,
+
+    visibility_scope         VARCHAR(32) NOT NULL DEFAULT 'private',
+    is_deleted               BOOLEAN NOT NULL DEFAULT FALSE,
+
+    virus_scan_status        VARCHAR(32) NOT NULL DEFAULT 'pending',
+    processing_attempts      INTEGER NOT NULL DEFAULT 0,
+    processing_error         TEXT NULL,
+
+    mediaconvert_job_code    VARCHAR(255) NULL,
+
+    created_at               TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at               TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at               TIMESTAMP NULL
+);</code></pre>
+
+      <h3>Indexes</h3>
+      <pre><code>CREATE INDEX idx_files_org_code ON files(org_code);
+CREATE INDEX idx_files_school_code ON files(school_code);
+CREATE INDEX idx_files_subject ON files(subject_type, subject_code);
+CREATE INDEX idx_files_related_entity ON files(related_entity_type, related_entity_code);
+CREATE INDEX idx_files_status ON files(status);
+CREATE INDEX idx_files_created_at ON files(created_at);
+CREATE UNIQUE INDEX idx_files_original_key_unique ON files(original_bucket, original_key);</code></pre>
+
+      <h3>Statuses</h3>
+      <p>
+        <span class="pill">uploading</span>
+        <span class="pill">uploaded</span>
+        <span class="pill">processing</span>
+        <span class="pill">ready</span>
+        <span class="pill">failed</span>
+        <span class="pill">quarantined</span>
+      </p>
+
+      <h3>Processed manifest example</h3>
+      <pre><code>{
+  "variants": [
+    {
+      "variant": "thumb_256",
+      "bucket": "daycare-processed-prod",
+      "key": "processed/org/org_sunrise/school/sch_bluebird/students/stu_001/profile-photo/2026/03/23/fil_a100/thumb_256/avatar.webp",
+      "mime_type": "image/webp",
+      "size_bytes": 18234,
+      "width": 256,
+      "height": 256
+    },
+    {
+      "variant": "large",
+      "bucket": "daycare-processed-prod",
+      "key": "processed/org/org_sunrise/school/sch_bluebird/students/stu_001/profile-photo/2026/03/23/fil_a100/large/avatar.webp",
+      "mime_type": "image/webp",
+      "size_bytes": 140223,
+      "width": 1440,
+      "height": 1080
+    }
+  ],
+  "primary_variant": "large"
+}</code></pre>
+    </section>
+
+    <section id="api">
+      <h2>12. API contracts</h2>
+
+      <h3>Create upload authorization</h3>
+      <pre><code>POST /v1/files/presign-upload</code></pre>
+
+      <h4>Request</h4>
+      <pre><code>{
+  "org_code": "org_sunrise",
+  "school_code": "sch_bluebird",
+  "subject_type": "students",
+  "subject_code": "stu_001",
+  "category": "activity-media",
+  "related_entity_type": "activity",
+  "related_entity_code": "act_20260323_001",
+  "filename": "painting.jpg",
+  "content_type": "image/jpeg",
+  "size_bytes": 2849921
+}</code></pre>
+
+      <h4>Response</h4>
+      <pre><code>{
+  "file_code": "fil_a100",
+  "status": "uploading",
+  "upload": {
+    "bucket": "daycare-raw-prod",
+    "key": "raw/org/org_sunrise/school/sch_bluebird/students/stu_001/activity-media/2026/03/23/fil_a100/original/painting.jpg",
+    "presigned_url": "&lt;signed-url&gt;",
+    "method": "PUT",
+    "headers": {
+      "Content-Type": "image/jpeg"
+    }
+  }
+}</code></pre>
+
+      <h3>Confirm upload</h3>
+      <pre><code>POST /v1/files/{file_code}/confirm-upload</code></pre>
+
+      <h3>Fetch file details</h3>
+      <pre><code>GET /v1/files/{file_code}</code></pre>
+
+      <h3>List files by business context</h3>
+      <pre><code>GET /v1/students/{student_code}/files
+GET /v1/staff/{staff_code}/files
+GET /v1/activities/{activity_code}/files
+GET /v1/orgs/{org_code}/newsletters/files</code></pre>
+
+      <div class="callout">
+        The presign endpoint must validate org access, optional school access, subject compatibility, category compatibility,
+        content type policy, size policy, and related entity ownership before issuing any upload URL.
+      </div>
+    </section>
+
+    <section id="keybuilder">
+      <h2>13. Key builder rules</h2>
+      <p>
+        All S3 keys must be produced by one shared library or service. This should exist in backend code and be reused by upload APIs,
+        processors, and migration scripts.
+      </p>
+
+      <h3>Raw key builder</h3>
+      <pre><code>buildRawKey(
+  org_code,
+  school_code,
+  subject_type,
+  subject_code,
+  category,
+  created_date,
+  file_code,
+  sanitized_filename
+)</code></pre>
+
+      <h3>Processed key builder</h3>
+      <pre><code>buildProcessedKey(
+  org_code,
+  school_code,
+  subject_type,
+  subject_code,
+  category,
+  created_date,
+  file_code,
+  variant,
+  filename
+)</code></pre>
+
+      <h3>Rules</h3>
+      <ul>
+        <li>If <code>school_code</code> is null, emit <code>school/_shared</code>.</li>
+        <li>If the subject does not require a specific subject code, emit <code>_shared</code> in that slot.</li>
+        <li>Lowercase all path segments except the final display filename if preserving case matters.</li>
+        <li>Do not trust client-supplied paths. The server always constructs the key.</li>
+        <li>Do not store uniqueness in filename. Uniqueness belongs to <code>file_code</code>.</li>
+      </ul>
+
+      <h3>Filename sanitization</h3>
+      <pre><code>Input:  "My Kid's Photo (Final).JPG"
+Output: "my-kids-photo-final.jpg"</code></pre>
+    </section>
+
+    <section id="validation">
+      <h2>14. Validation policy</h2>
+
+      <h3>Allowed file families</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Family</th>
+              <th>Examples</th>
+              <th>Default size guidance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Images</td>
+              <td>jpeg, png, webp, optionally heic</td>
+              <td>10 MB for profile photos, 20 MB for activity images</td>
+            </tr>
+            <tr>
+              <td>Videos</td>
+              <td>mp4, mov, optionally webm</td>
+              <td>500 MB default, plan-dependent</td>
+            </tr>
+            <tr>
+              <td>Documents</td>
+              <td>pdf, doc, docx, xls, xlsx, csv</td>
+              <td>25 MB default unless policy says otherwise</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Validation stages</h3>
+      <ol>
+        <li>Presign API validates declared file metadata.</li>
+        <li>Processor validates actual object metadata and MIME signature again.</li>
+        <li>Optional malware scan validates document safety before <code>ready</code> state.</li>
+      </ol>
+
+      <div class="callout warn">
+        Never trust only the browser-reported content type. Re-check server-side during processing.
+      </div>
+    </section>
+
+    <section id="processing">
+      <h2>15. Processing pipelines</h2>
+
+      <h3>Event path</h3>
+      <pre><code>S3 raw bucket → S3 notification → SQS queue → Lambda processor</code></pre>
+
+      <h3>Router Lambda behavior</h3>
+      <ol>
+        <li>Read bucket and key from SQS payload.</li>
+        <li>Find file record using <code>original_bucket + original_key</code>.</li>
+        <li>Skip safely if record is already <code>ready</code> or deleted.</li>
+        <li>Mark file as <code>processing</code>.</li>
+        <li>Determine file family: image, video, document, other.</li>
+        <li>Dispatch to specialized processor path.</li>
+        <li>Write manifest and final metadata.</li>
+        <li>Mark <code>ready</code> or <code>failed</code>.</li>
+      </ol>
+
+      <h3>Image pipeline</h3>
+      <ul>
+        <li>Use Lambda with Sharp or equivalent.</li>
+        <li>Generate avatar sizes for profile photos.</li>
+        <li>Generate gallery-friendly sizes for activity media.</li>
+        <li>Normalize EXIF orientation and strip unnecessary metadata.</li>
+        <li>Store WebP by default, optionally AVIF later.</li>
+      </ul>
+
+      <h3>Video pipeline</h3>
+      <ul>
+        <li>Router Lambda submits a MediaConvert job.</li>
+        <li>Store job code in DB.</li>
+        <li>MediaConvert writes outputs to processed bucket.</li>
+        <li>Completion handler updates manifest with video variants and poster frame.</li>
+      </ul>
+
+      <h3>Document pipeline</h3>
+      <ul>
+        <li>Preserve original.</li>
+        <li>Generate preview image or lightweight preview PDF.</li>
+        <li>Optionally extract text or OCR JSON for search and indexing.</li>
+      </ul>
+
+      <div class="cards">
+        <div class="card">
+          <h4>Image recommendation</h4>
+          <p><strong>Use Lambda directly.</strong> This is ideal for thumbnails, resizing, compression, and WebP delivery variants.</p>
+        </div>
+        <div class="card">
+          <h4>Video recommendation</h4>
+          <p><strong>Use Lambda only as orchestrator.</strong> Submit serious transcoding work to MediaConvert.</p>
+        </div>
+        <div class="card">
+          <h4>Document recommendation</h4>
+          <p><strong>Preserve originals.</strong> Generate previews and extracted text rather than aggressive compression.</p>
+        </div>
+        <div class="card">
+          <h4>Idempotency requirement</h4>
+          <p><strong>All processors must be safe to rerun.</strong> Retries and duplicate events should not corrupt state.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="security">
+      <h2>16. Security model</h2>
+      <h3>Core controls</h3>
+      <ul>
+        <li>Block all public access on both buckets.</li>
+        <li>Encrypt at rest using SSE-S3 or SSE-KMS.</li>
+        <li>Use CloudFront to serve processed files.</li>
+        <li>Do not expose raw bucket directly to end users.</li>
+        <li>Authorize every read using org, school, subject, and related entity checks.</li>
+        <li>Issue presigned upload URLs only for one exact key and short expiry.</li>
+        <li>Keep upload audit fields: uploader code, role, timestamps, client source if needed.</li>
+      </ul>
+
+      <h3>Access logic</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Requester</th>
+              <th>Can access if</th>
+              <th>Typical scope</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Org admin</td>
+              <td>Belongs to org and role policy allows file scope</td>
+              <td>Org-wide, often including school-shared</td>
+            </tr>
+            <tr>
+              <td>School admin</td>
+              <td>Belongs to school and policy allows school subject/entity</td>
+              <td>School-level + student/staff/guardian under that school</td>
+            </tr>
+            <tr>
+              <td>Staff</td>
+              <td>Belongs to school or org and relationship policy allows view</td>
+              <td>Own media, assigned students, school materials</td>
+            </tr>
+            <tr>
+              <td>Guardian</td>
+              <td>Relationship to student is valid</td>
+              <td>Their own files and their child's permitted files</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        Do not authorize access based only on the S3 key prefix. The database is the policy checkpoint.
+      </div>
+    </section>
+
+    <section id="observability">
+      <h2>17. Observability and reliability</h2>
+      <h3>Track these metrics</h3>
+      <ul>
+        <li>Presign requests per org and category</li>
+        <li>Upload completion rate</li>
+        <li>Processing success and failure rates by file family</li>
+        <li>Image compression ratio</li>
+        <li>Video job completion time</li>
+        <li>Document preview generation time</li>
+        <li>DLQ count and failure reasons</li>
+      </ul>
+
+      <h3>Structured log fields</h3>
+      <pre><code>{
+  "file_code": "fil_a100",
+  "org_code": "org_sunrise",
+  "school_code": "sch_bluebird",
+  "subject_type": "students",
+  "subject_code": "stu_001",
+  "status": "processing",
+  "processor": "image-lambda"
+}</code></pre>
+
+      <h3>Reliability patterns</h3>
+      <ul>
+        <li>SQS with DLQ for retry control</li>
+        <li>Idempotent workers</li>
+        <li>Deterministic output paths</li>
+        <li>Manifest write only after outputs are safely written</li>
+        <li>Alerting on repeated failures or MediaConvert backlog</li>
+      </ul>
+    </section>
+
+    <section id="retention">
+      <h2>18. Lifecycle and retention</h2>
+
+      <h3>Raw bucket lifecycle</h3>
+      <ul>
+        <li>Keep recent originals in Standard storage.</li>
+        <li>Transition older originals to Standard-IA or Glacier based on access patterns.</li>
+        <li>Do not auto-delete unless product and compliance policy explicitly allow it.</li>
+      </ul>
+
+      <h3>Processed bucket lifecycle</h3>
+      <ul>
+        <li>Keep active thumbnails, previews, and common variants hot.</li>
+        <li>Expire temporary intermediates automatically.</li>
+        <li>Delete or regenerate derivatives when parent file is replaced or purged.</li>
+      </ul>
+
+      <h3>Delete policy</h3>
+      <ol>
+        <li>Soft-delete in DB first.</li>
+        <li>Mark object as hidden in product APIs.</li>
+        <li>Background purge S3 objects if retention rules allow physical deletion.</li>
+      </ol>
+    </section>
+
+    <section id="implementation">
+      <h2>19. Step-by-step implementation plan</h2>
+
+      <h3>Phase 1 — foundation</h3>
+      <ol>
+        <li>Freeze enums: subject types, categories, file families, statuses, variants.</li>
+        <li>Create raw and processed buckets per environment.</li>
+        <li>Create the <code>files</code> table and indexes.</li>
+        <li>Build shared key builder and filename sanitizer utilities.</li>
+        <li>Define upload policy limits by category and role.</li>
+      </ol>
+
+      <h3>Phase 2 — upload path</h3>
+      <ol>
+        <li>Build <code>POST /v1/files/presign-upload</code>.</li>
+        <li>Create DB row before issuing presigned URL.</li>
+        <li>Implement frontend direct upload.</li>
+        <li>Optionally add explicit upload confirmation endpoint.</li>
+      </ol>
+
+      <h3>Phase 3 — processing</h3>
+      <ol>
+        <li>Configure S3 raw bucket notifications to SQS.</li>
+        <li>Build router Lambda.</li>
+        <li>Implement image processor Lambda.</li>
+        <li>Implement document preview processor.</li>
+        <li>Integrate MediaConvert submission and completion handling.</li>
+      </ol>
+
+      <h3>Phase 4 — delivery</h3>
+      <ol>
+        <li>Put CloudFront in front of processed bucket.</li>
+        <li>Implement file metadata and file listing APIs.</li>
+        <li>Return allowed variant URLs based on authorization.</li>
+      </ol>
+
+      <h3>Phase 5 — hardening</h3>
+      <ol>
+        <li>Add malware scan and quarantine flow.</li>
+        <li>Add dashboards, alarms, and DLQ handling.</li>
+        <li>Add lifecycle policies and deletion workflows.</li>
+        <li>Add reprocessing support when image/video rules change.</li>
+      </ol>
+    </section>
+
+    <section id="checklist">
+      <h2>20. Production go-live checklist</h2>
+      <div class="checklist">
+        <div class="check"><div>✓</div><div><b>Prefix model finalized</b><br>Every key includes org and school scope, with <code>_shared</code> fallback where needed.</div></div>
+        <div class="check"><div>✓</div><div><b>Code-based identifiers only</b><br>No API, path, or schema field uses <code>id</code> naming.</div></div>
+        <div class="check"><div>✓</div><div><b>DB source of truth implemented</b><br>No business logic depends on S3 listing.</div></div>
+        <div class="check"><div>✓</div><div><b>Raw and processed bucket separation enforced</b><br>No recursive event loops.</div></div>
+        <div class="check"><div>✓</div><div><b>SQS + DLQ in place</b><br>Processing retries are controlled and observable.</div></div>
+        <div class="check"><div>✓</div><div><b>Image/video/document routing complete</b><br>Lambda for images, MediaConvert for videos, previews for documents.</div></div>
+        <div class="check"><div>✓</div><div><b>CloudFront delivery ready</b><br>Only processed and authorized assets are served.</div></div>
+        <div class="check"><div>✓</div><div><b>Lifecycle and deletion policies approved</b><br>Retention behavior aligns with product and compliance expectations.</div></div>
+      </div>
+
+      <div class="callout good">
+        This design is ready to scale from a few schools to a large multi-org SaaS, while preserving strong file ownership,
+        deterministic storage, and production-grade processing patterns.
+      </div>
+    </section>
+
+    <p class="footer">
+      Prepared as a long-form internal technical webpage for implementation planning, engineering alignment, and architecture review.
+    </p>
+  </main>
+</div>
+
+<a class="top-link" href="#top">Back to top ↑</a>
+</body>
+</html>
